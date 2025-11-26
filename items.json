@@ -1,0 +1,102 @@
+{
+    "4": {
+        "name": "emas",
+        "price": 900000,
+        "stock": 9
+    },
+    "5": {
+        "name": "patung yunani",
+        "price": 900000,
+        "stock": 8
+    },
+    "6": {
+        "name": "gagak emas",
+        "price": 9000000,
+        "stock": 9
+    },
+    "1": {
+        "name": "mahkota raja inggris ke-II",
+        "price": 90000000000,
+        "stock": 1
+    },
+    "2": {
+        "name": "lambhorgini ronaldo",
+        "price": 9000000000,
+        "stock": 1
+    },
+    "3": {
+        "name": "gas elpiji pak prabowo",
+        "price": 900000,
+        "stock": 1
+    },
+    "7": {
+        "name": "moge pak prabowo",
+        "price": 90000000,
+        "stock": 1
+    },
+    "8": {
+        "name": "apple jaman nuh",
+        "price": 900000000,
+        "stock": 1
+    },
+    "9": {
+        "name": "buku the prince niccolo machiavelli",
+        "price": 900000000,
+        "stock": 2
+    },
+    "10": {
+        "name": "katana 1888",
+        "price": 900000,
+        "stock": 1
+    },
+    "11": {
+        "name": "excalibur",
+        "price": 9000000000,
+        "stock": 2
+    },
+    "12": {
+        "name": "peluru wwII",
+        "price": 900000,
+        "stock": 9
+    },
+    "13": {
+        "name": "piring kerajaan",
+        "price": 900000,
+        "stock": 1
+    },
+    "14": {
+        "name": "pedang naga",
+        "price": 90000000000,
+        "stock": 1
+    },
+    "15": {
+        "name": "kris",
+        "price": 90000,
+        "stock": 1
+    },
+    "16": {
+        "name": "mandau dayak",
+        "price": 90000000,
+        "stock": 1
+    },
+    "17": {
+        "name": "emas jawa",
+        "price": 900000,
+        "stock": 1
+    },
+    "18": {
+        "name": "tangan emas",
+        "price": 9000000,
+        "stock": 1
+    },
+    "19": {
+        "name": "pedang salib",
+        "price": 90000000,
+        "stock": 2
+    },
+    "20": {
+        "name": "emas batang",
+        "price": 9000000,
+        "stock": 9
+    }
+}

@@ -1,0 +1,47 @@
+[
+    {
+        "id": "1",
+        "name": "emas jawa",
+        "owner": "kiel",
+        "price": 900000,
+        "quantity": 9,
+        "status": "Diterima",
+        "time": "2025-11-25 11:32:39"
+    },
+    {
+        "id": "18",
+        "name": "tangan emas",
+        "owner": "kiel",
+        "price": 9000000,
+        "quantity": 1,
+        "status": "Diterima",
+        "time": "2025-11-25 11:51:17"
+    },
+    {
+        "id": "19",
+        "name": "pedang salib",
+        "owner": "kiel",
+        "price": 90000000,
+        "quantity": 1,
+        "status": "Diterima",
+        "time": "2025-11-25 12:02:10"
+    },
+    {
+        "id": "20",
+        "name": "emas batang",
+        "owner": "kiel",
+        "price": 9000000,
+        "quantity": 1,
+        "status": "Diterima",
+        "time": "2025-11-25 12:05:48"
+    },
+    {
+        "id": "19",
+        "name": "pedang salib",
+        "owner": "kiel",
+        "price": 90000000,
+        "quantity": 1,
+        "status": "Diterima",
+        "time": "2025-11-25 12:08:41"
+    }
+]
