@@ -111,7 +111,7 @@
         "quantity": 1
     },
     {
-        "id": "17",
+        "id": "1",
         "time": "2025-11-25 11:32:39",
         "name": "emas jawa",
         "price": 900000,
@@ -121,7 +121,7 @@
         "status": "Diterima"
     },
     {
-        "id": "1",
+        "id": "2",
         "time": "2025-11-25 11:32:46",
         "name": "emas jawa",
         "price": 900000,
@@ -137,6 +137,47 @@
         "buyer": "Toko (Admin)",
         "seller": "kiel",
         "quantity": 8,
-        "status": "Diterima"
+        "status": "Diterima",
+        "id": "3"
+    },
+    {
+        "time": "2025-11-26 20:10:44",
+        "name": "pedang keramat",
+        "stock": 1,
+        "price": 9000000,
+        "buyer": "-",
+        "seller": "kiel",
+        "status": "Ditolak",
+        "id": "4"
+    },
+    {
+        "time": "2025-11-26 20:20:41",
+        "name": "motor supra x",
+        "stock": 1,
+        "price": 9000000,
+        "buyer": "-",
+        "seller": "kiel",
+        "status": "Ditolak",
+        "id": "5"
+    },
+    {
+        "time": "2025-11-26 20:37:33",
+        "name": "mo",
+        "stock": 1,
+        "price": 9000,
+        "buyer": "-",
+        "seller": "kiel",
+        "status": "Ditolak",
+        "id": "6"
+    },
+    {
+        "time": "2025-11-26 20:42:55",
+        "name": "mo",
+        "stock": 9,
+        "price": 90000,
+        "buyer": "-",
+        "seller": "kiel",
+        "status": "Ditolak",
+        "id": "7"
     }
 ]

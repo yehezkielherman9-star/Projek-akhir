@@ -27,7 +27,7 @@ def admin_menu():
         ])
 
         # =========================================================
-        # 0. TAMBAH BARANG / TAMBAH STOK
+        # 0. TAMBAH BARANG
         # =========================================================
         if pilih == 0:
             header("TAMBAH BARANG")
@@ -54,14 +54,13 @@ def admin_menu():
             stock = int(stock_input)
 
             if confirm_or_back(
-                f"Apakah yakin ingin menambahkan '{name}' "
-                f"seharga Rp{price} dengan stok {stock}?"
+                f"Tambah '{name}' harga Rp{price} stok {stock}?"
             ) is None:
                 continue
 
             new_id = items.add_item(name, price, stock)
             message(
-                "Barang berhasil ditambahkan!\n"
+                f"Barang berhasil ditambahkan!\n"
                 f"ID: {new_id}\nNama: {name}\nHarga: Rp{price}\nStok: {stock}"
             )
 
@@ -85,10 +84,14 @@ def admin_menu():
                 message("Barang tidak ditemukan.")
                 continue
 
-            item = storage.items[item_id]
-
-            rows = [[item_id, item["name"], f"Rp{item['price']}", item.get("stock", 0)]]
+            # tampilkan tabel semua barang
+            rows = [
+                [iid, v["name"], f"Rp{v['price']}", v.get("stock", 0)]
+                for iid, v in storage.items.items()
+            ]
             message(make_table(["ID", "Nama", "Harga", "Stok"], rows))
+
+            item = storage.items[item_id]
 
             new_name = prompt("Nama baru (enter jika tidak):").strip()
             new_price_input = prompt("Harga baru (enter jika tidak):").strip()
@@ -114,7 +117,7 @@ def admin_menu():
                 new_stock = int(new_stock_input)
 
             if confirm_or_back(
-                f"Apakah ingin menyimpan perubahan barang '{item['name']}'?"
+                f"Simpan perubahan untuk '{item['name']}'?"
             ) is None:
                 continue
 
@@ -129,7 +132,7 @@ def admin_menu():
             message("Barang berhasil diperbarui.")
 
         # =========================================================
-        # 2. LIHAT BARANG
+        # 2. LIST BARANG TOKO
         # =========================================================
         elif pilih == 2:
             header("LIST BARANG TOKO")
@@ -139,28 +142,26 @@ def admin_menu():
                 continue
 
             rows = [
-                [item_id, v["name"], f"Rp{v['price']}", v.get("stock", 0)]
-                for item_id, v in storage.items.items()
+                [iid, v["name"], f"Rp{v['price']}", v.get("stock", 0)]
+                for iid, v in storage.items.items()
             ]
-
             message(make_table(["ID", "Nama", "Harga", "Stok"], rows))
 
         # =========================================================
-        # 3. KONFIRMASI PENJUALAN DARI PELANGGAN
+        # 3. KONFIRMASI PENJUALAN CUSTOMER
         # =========================================================
         elif pilih == 3:
-            header("KONFIRMASI PENJUALAN DARI PELANGGAN")
+            header("KONFIRMASI PENJUALAN PELANGGAN")
 
             if not storage.sell_queue:
                 message("Tidak ada barang menunggu.")
                 continue
 
             rows = [
-                [item_id, v["name"], f"Rp{v['price']}", v["stock"], v["owner"]]
-                for item_id, v in storage.sell_queue.items()
+                [iid, d["name"], f"Rp{d['price']}", d["stock"], d["owner"]]
+                for iid, d in storage.sell_queue.items()
             ]
-
-            print(make_table(
+            message(make_table(
                 ["ID", "Nama", "Harga", "Stok", "Pemilik"], rows
             ))
 
@@ -169,19 +170,18 @@ def admin_menu():
                 for i, d in storage.sell_queue.items()
             ])
 
-            inp = prompt_under_list(list_text, "\nID diproses:")
+            inp = prompt_under_list(list_text, "ID diproses:")
             if inp not in storage.sell_queue:
                 message("ID tidak ditemukan.")
                 continue
 
             aksi = menu("Aksi:", ["Setujui", "Tolak", "Batal"])
 
-            # SETUJUI
+            # ===== SETUJUI =====
             if aksi == 0:
                 max_stock = storage.sell_queue[inp].get("stock", 1)
-
                 jumlah_input = prompt(
-                    f"Masukkan jumlah yang disetujui (maks {max_stock}):"
+                    f"Jumlah disetujui (maks {max_stock}): "
                 )
 
                 if not jumlah_input.isdigit() or int(jumlah_input) <= 0:
@@ -191,42 +191,51 @@ def admin_menu():
                 jumlah = int(jumlah_input)
 
                 success = items.approve_buy_from_customer(inp, jumlah)
+                items.refresh_sell_queue()
+                items.refresh_sales_history()
+
                 if success:
-                    message(
-                        f"Barang disetujui! "
-                        f"({jumlah} item masuk ke toko)"
-                    )
+                    message(f"Disetujui! {jumlah} item masuk ke toko")
                 else:
                     message("Gagal menyetujui barang.")
 
-            # TOLAK
+            # ===== TOLAK =====
             elif aksi == 1:
                 success = items.reject_sell_item(inp)
+                items.refresh_sell_queue()
+                items.refresh_sales_history()
+
                 if success:
                     message("Barang ditolak.")
                 else:
                     message("Gagal menolak barang.")
 
         # =========================================================
-        # 4. HISTORY
+        # 4. HISTORY ADMIN
         # =========================================================
         elif pilih == 4:
             header("HISTORY TRANSAKSI")
+
+            items.refresh_sales_history()
 
             if not storage.sales_history:
                 message("Belum ada history.")
                 continue
 
-            text = "\n".join([
-                f"{h['time']} | {h['name']} x{h.get('quantity',1)} "
-                f"| Rp{h['price']} | {h['buyer']} <-- {h['seller']}"
+            rows = [
+                [
+                    h["time"],
+                    f"{h['name']} x{h.get('quantity', h.get('stock', 1))}",
+                    f"Rp{h['price']}",
+                    f"{h['buyer']} <-- {h['seller']}",
+                    h.get("status", "-")
+                ]
                 for h in storage.sales_history
-            ])
+            ]
 
-            message(text)
+            message(make_table(
+                ["Waktu", "Barang", "Harga", "Transaksi", "Status"], rows
+            ))
 
-        # =========================================================
-        # 5. LOGOUT
-        # =========================================================
         else:
             break

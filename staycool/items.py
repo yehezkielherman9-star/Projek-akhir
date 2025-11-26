@@ -8,17 +8,15 @@ def normalize_id(item_id):
     return str(item_id)
 
 # ==================================================
-# Tambah Barang / Add Item (dengan stok)
+# Tambah Barang
 # ==================================================
 def add_item(name, price, stock=1):
-    # Jika barang sudah ada di toko, update stok
     for item_id, item in storage.items.items():
         if item["name"].lower() == name.lower():
             item["stock"] = item.get("stock", 0) + stock
             storage.save_all()
             return item_id
 
-    # Cari ID numerik terkecil yang belum digunakan
     new_id = 1
     while str(new_id) in storage.items:
         new_id += 1
@@ -28,27 +26,20 @@ def add_item(name, price, stock=1):
         "price": price,
         "stock": stock
     }
-    storage.save_all()
-    return str(new_id)
 
-# ==================================================
-# Hapus Barang
-# ==================================================
-def delete_item(item_id):
-    key = normalize_id(item_id)
-    if key not in storage.items:
-        return None
-    deleted = storage.items.pop(key)
     storage.save_all()
-    return deleted
+    refresh_items()
+    return str(new_id)
 
 # ==================================================
 # Customer Membeli Barang
 # ==================================================
 def customer_buy_item(item_id, username):
     key = normalize_id(item_id)
+
     if key not in storage.items or storage.items[key]["stock"] <= 0:
         return False
+
     item = storage.items[key]
     item["stock"] -= 1
 
@@ -57,8 +48,9 @@ def customer_buy_item(item_id, username):
         "name": item["name"],
         "price": item["price"],
         "buyer": username,
-        "seller": "Toko"
-    })  
+        "seller": "Toko",
+        "status": "Terjual"
+    })
 
     if item["stock"] == 0:
         del storage.items[key]
@@ -67,9 +59,10 @@ def customer_buy_item(item_id, username):
     return True
 
 # ==================================================
-# Customer Mengajukan Barang untuk Dijual
+# Customer Ajukan Jual Barang (Pending)
 # ==================================================
 def request_sell_item(owner, name, price, stock=1):
+
     for item_id, item in storage.sell_queue.items():
         if (
             item["name"].lower() == name.lower()
@@ -77,9 +70,10 @@ def request_sell_item(owner, name, price, stock=1):
             and item["price"] == price
         ):
             item["stock"] += stock
+            item["status"] = "Menunggu Konfirmasi"
             storage.save_all()
             return item_id
-    # Cari ID numerik terkecil yang belum digunakan
+
     new_id = 1
     while str(new_id) in storage.sell_queue:
         new_id += 1
@@ -89,13 +83,15 @@ def request_sell_item(owner, name, price, stock=1):
         "price": price,
         "owner": owner,
         "stock": stock,
-        "status": "Menunggu konfirmasi"
+        "status": "Menunggu Konfirmasi"
     }
+
     storage.save_all()
+    refresh_sell_queue()
     return str(new_id)
 
 # ==================================================
-# Approve Barang dari Customer
+# ADMIN – Setujui Barang Customer
 # ==================================================
 def approve_buy_from_customer(item_id, quantity):
     key = normalize_id(item_id)
@@ -104,52 +100,98 @@ def approve_buy_from_customer(item_id, quantity):
         return False
 
     data = storage.sell_queue[key]
-    available_stock = data.get("stock", 1)
+    available_stock = data["stock"]
 
-    # Validate quantity
     if quantity <= 0 or quantity > available_stock:
         return False
 
-    # Add item to shop inventory using the offered price
-    new_id = add_item(data["name"], data["price"], stock=quantity)
+    add_item(data["name"], data["price"], stock=quantity)
 
-    # Update remaining stock in queue or remove if fully approved
     remaining = available_stock - quantity
+
     if remaining <= 0:
         storage.sell_queue.pop(key)
     else:
         storage.sell_queue[key]["stock"] = remaining
+        storage.sell_queue[key]["status"] = "Menunggu Konfirmasi"
 
-    # Record transaction in sales history
+    # Tambahkan history diterima
     storage.sales_history.append({
         "time": now_time(),
         "name": data["name"],
+        "quantity": quantity,
         "price": data["price"],
         "buyer": "Toko (Admin)",
         "seller": data["owner"],
-        "quantity": quantity,
         "status": "Diterima"
     })
 
     storage.save_all()
+    refresh_sell_queue()
+    refresh_sales_history()
     return True
 
+# ==================================================
+# ADMIN – Tolak Barang Customer
+# ==================================================
 def reject_sell_item(item_id):
     key = normalize_id(item_id)
-    if item_id not in storage.sell_queue:
+
+    if key not in storage.sell_queue:
         return False
 
-    storage.sell_queue.pop(item_id)
+    data = storage.sell_queue[key]
+
+    storage.sales_history.append({
+        "time": now_time(),
+        "name": data["name"],
+        "stock": data["stock"],
+        "price": data["price"],
+        "buyer": "-",
+        "seller": data["owner"],
+        "status": "Ditolak"
+    })
+
+    storage.sell_queue.pop(key)
+
     storage.save_all()
+    refresh_sell_queue()
+    refresh_sales_history()
     return True
-# ==================================================
-# List Semua Barang (urut ID)
-# ==================================================
-def format_items_list(items_dict):
-    lines = []
-    for item_id in sorted(items_dict, key=lambda x: int(x)):
-        item = items_dict[item_id]
-        lines.append(f"{item_id}. {item['name']} - Rp{item['price']} | Stok: {item.get('stock',0)}")
-    return "\n".join(lines)
 
+# ==================================================
+# Refresh Item Toko
+# ==================================================
+def refresh_items():
+    storage.items = dict(sorted(storage.items.items(), key=lambda x: int(x[0])))
+    storage.save_all()
 
+# ==================================================
+# Refresh Sell Queue (Pending ID selalu urut)
+# ==================================================
+def refresh_sell_queue():
+    new_dict = {}
+    new_id = 1
+
+    for old_id, data in sorted(storage.sell_queue.items(), key=lambda x: int(x[0])):
+        new_dict[str(new_id)] = data
+        new_id += 1
+
+    storage.sell_queue = new_dict
+    storage.save_all()
+
+# ==================================================
+# Refresh History (ID bagian Diterima & Ditolak selalu urut)
+# ==================================================
+def refresh_sales_history():
+    new_list = []
+    new_id = 1
+
+    for h in storage.sales_history:
+        if h.get("status") in ["Diterima", "Ditolak"]:
+            h["id"] = str(new_id)
+            new_id += 1
+        new_list.append(h)
+
+    storage.sales_history = new_list
+    storage.save_all()

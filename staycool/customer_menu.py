@@ -25,36 +25,42 @@ def customer_menu(username):
         # 0. LIHAT BARANG TOKO
         # =========================================================
         if pilih == 0:
+            print()
+            header("List Barang Di Toko")
+
             if not storage.items:
                 message("Belum ada barang di toko.")
                 continue
 
             rows = [
-                [i, d["name"], f"Rp{d['price']}", d.get("stock", 0)]
-                for i, d in storage.items.items()
+                [item_id, d["name"], f"Rp{d['price']}", d.get("stock", 0)]
+                for item_id, d in storage.items.items()
             ]
 
-            table_text = make_table(
-                ["ID", "Nama", "Harga", "Stok"], rows
-            )
-            message(table_text)
+            message(make_table(
+                ["ID", "Nama", "Harga", "Stok"],
+                rows
+            ))
 
         # =========================================================
         # 1. BELI BARANG
         # =========================================================
         elif pilih == 1:
+            print()
+            header("Beli Barang")
+
             if not storage.items:
                 message("Belum ada barang di toko.")
                 continue
 
-            # tampilkan tabel
+            # TABEL TOKO
             rows = [
-                [i, d["name"], f"Rp{d['price']}", d.get("stock", 0)]
-                for i, d in storage.items.items()
+                [item_id, d["name"], f"Rp{d['price']}", d.get("stock", 0)]
+                for item_id, d in storage.items.items()
             ]
-            table_text = make_table(["ID", "Nama", "Harga", "Stok"], rows)
-            
-            # buat list untuk selection
+            message(make_table(["ID", "Nama", "Harga", "Stok"], rows))
+
+            # LIST PILIHAN
             list_text = "\n".join([
                 f"{i}. {d['name']} - Rp{d['price']} | Stok: {d.get('stock', 0)}"
                 for i, d in storage.items.items()
@@ -65,12 +71,17 @@ def customer_menu(username):
                 continue
 
             item_id = str(inp).strip()
+
             if item_id not in storage.items:
                 message("Barang tidak ditemukan.")
                 continue
 
             item = storage.items[item_id]
-            jumlah_input = prompt(f"Jumlah pembelian (tersedia {item.get('stock', 0)}): ").strip()
+
+            jumlah_input = prompt(
+                f"Jumlah pembelian (tersedia {item.get('stock', 0)}): "
+            ).strip()
+
             if not jumlah_input.isdigit() or int(jumlah_input) <= 0:
                 message("Jumlah tidak valid.")
                 continue
@@ -82,10 +93,10 @@ def customer_menu(username):
             ) is None:
                 continue
 
-            success_count = 0
-            for _ in range(jumlah):
-                if items.customer_buy_item(item_id, username):
-                    success_count += 1
+            success_count = sum(
+                1 for _ in range(jumlah)
+                if items.customer_buy_item(item_id, username)
+            )
 
             message(f"Pembelian berhasil: {success_count} dari {jumlah}")
 
@@ -93,6 +104,9 @@ def customer_menu(username):
         # 2. JUAL BARANG KE TOKO
         # =========================================================
         elif pilih == 2:
+            print()
+            header("Jual Barang Ke Toko")
+
             name = prompt("Nama barang: ").strip()
             if not name:
                 message("Nama tidak boleh kosong.")
@@ -102,7 +116,6 @@ def customer_menu(username):
             if not price_input.isdigit():
                 message("Harga tidak valid.")
                 continue
-
             price = int(price_input)
 
             jumlah_input = prompt("Jumlah barang: ").strip()
@@ -117,15 +130,19 @@ def customer_menu(username):
             ) is None:
                 continue
 
-            # cek apakah user sudah punya item serupa
+            # CEK ITEM SAMA YANG MASIH PENDING
             existing_id = None
             for item_id, data in storage.sell_queue.items():
-                if data["name"].lower() == name.lower() and data["owner"] == username:
+                if (
+                    data["name"].lower() == name.lower()
+                    and data["owner"] == username
+                ):
                     existing_id = item_id
                     break
 
             if existing_id:
                 storage.sell_queue[existing_id]["stock"] += jumlah
+                storage.sell_queue[existing_id]["status"] = "Menunggu Konfirmasi"
                 storage.save_all()
 
                 message(
@@ -134,8 +151,10 @@ def customer_menu(username):
                     f"Nama: {name}\n"
                     f"Stok sekarang: {storage.sell_queue[existing_id]['stock']}"
                 )
+
             else:
                 new_id = items.request_sell_item(username, name, price, stock=jumlah)
+
                 message(
                     f"Pengajuan berhasil!\n"
                     f"Nama: {name}\n"
@@ -147,45 +166,75 @@ def customer_menu(username):
         # 3. STATUS BARANG YANG DIJUAL
         # =========================================================
         elif pilih == 3:
-            pending = [
-                (i, d) for i, d in storage.sell_queue.items()
-                if d["owner"] == username
-            ]
+            print()
+            header("Status Barang Yang Anda Jual")
 
-            history = [
-                h for h in storage.sell_history
-                if h["owner"] == username
-            ]
+            pending = []
+            diterima = []
+            ditolak = []
 
-            if not pending and not history:
+            # === Pending (sell_queue)
+            for item_id, d in storage.sell_queue.items():
+                if d["owner"] == username:
+                    pending.append((item_id, d))
+
+            # === Final Status (sales_history)
+            for h in storage.sales_history:
+                if h.get("seller") != username:
+                    continue
+
+                if h.get("status") == "Diterima":
+                    diterima.append(h)
+                elif h.get("status") == "Ditolak":
+                    ditolak.append(h)
+
+            if not pending and not diterima and not ditolak:
                 message("Tidak ada barang milik Anda.")
                 continue
 
-            # Pending
-            if pending:
-                rows_pending = [
+            # =========================================================
+            # TABEL 2 — DITERIMA
+            # =========================================================
+            if diterima:
+                print()
+                header("BARANG DISETUJUI ADMIN")
+
+                rows_diterima = [
                     [
-                        i, d["name"], f"Rp{d['price']}",
-                        d.get("stock", 1),
-                        d.get("status", "Menunggu")
+                        h.get("name", "-"),
+                        h.get("quantity", h.get("stock", 1)),
+                        "Diterima",
+                        f"Rp{h.get('price', '-')}"
                     ]
-                    for i, d in pending
+                    for h in diterima
                 ]
+
                 message(make_table(
-                    ["ID", "Nama", "Harga", "Stok", "Status"], rows_pending
+                    ["Nama", "Jumlah", "Status", "Harga Akhir"],
+                    rows_diterima
                 ))
 
-            # History
-            if history:
-                rows_history = [
+
+            # =========================================================
+            # TABEL 3 — DITOLAK
+            # =========================================================
+            if ditolak:
+                print()
+                header("BARANG DITOLAK ADMIN")
+
+                rows_ditolak = [
                     [
-                        h["id"], h["name"], h["stock"],
-                        h["status"], f"Rp{h.get('final_price', '-')}"
+                        h.get("name", "-"),
+                        h.get("quantity", h.get("stock", 1)),
+                        "Ditolak",
+                        f"Rp{h.get('price', '-')}"
                     ]
-                    for h in history
+                    for h in ditolak
                 ]
+
                 message(make_table(
-                    ["ID", "Nama", "Stok", "Status", "Harga Akhir"], rows_history
+                    ["Nama", "Jumlah", "Status", "Harga Akhir"],
+                    rows_ditolak
                 ))
 
         # =========================================================

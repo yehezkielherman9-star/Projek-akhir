@@ -20,7 +20,8 @@ def main():
         if choice_idx == 0:
             header("LOGIN")
             username = prompt("Username:")
-            password = prompt("Password:")
+            password = prompt("Password:"
+            )
 
             success, msg_or_role = login(username, password)
 

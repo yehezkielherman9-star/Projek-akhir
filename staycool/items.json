@@ -1,19 +1,4 @@
 {
-    "4": {
-        "name": "emas",
-        "price": 900000,
-        "stock": 9
-    },
-    "5": {
-        "name": "patung yunani",
-        "price": 900000,
-        "stock": 8
-    },
-    "6": {
-        "name": "gagak emas",
-        "price": 9000000,
-        "stock": 9
-    },
     "1": {
         "name": "mahkota raja inggris ke-II",
         "price": 90000000000,
@@ -28,6 +13,21 @@
         "name": "gas elpiji pak prabowo",
         "price": 900000,
         "stock": 1
+    },
+    "4": {
+        "name": "emas",
+        "price": 900000,
+        "stock": 9
+    },
+    "5": {
+        "name": "patung yunani",
+        "price": 900000,
+        "stock": 8
+    },
+    "6": {
+        "name": "gagak emas",
+        "price": 9000000,
+        "stock": 9
     },
     "7": {
         "name": "moge pak prabowo",
@@ -98,5 +98,15 @@
         "name": "emas batang",
         "price": 9000000,
         "stock": 9
+    },
+    "21": {
+        "name": "jawa",
+        "price": 1000000000,
+        "stock": 10
+    },
+    "22": {
+        "name": "jumanji",
+        "price": 9000000,
+        "stock": 1
     }
 }
