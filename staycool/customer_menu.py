@@ -21,9 +21,9 @@ def customer_menu(username):
             ]
         )
 
-        # =========================================================
-        # 0. LIHAT BARANG TOKO
-        # =========================================================
+        
+        # 0. lihat barang di toko
+       
         if pilih == 0:
             print()
             header("List Barang Di Toko")
@@ -42,9 +42,9 @@ def customer_menu(username):
                 rows
             ))
 
-        # =========================================================
-        # 1. BELI BARANG
-        # =========================================================
+        
+        # 1. beli barang
+        
         elif pilih == 1:
             print()
             header("Beli Barang")
@@ -100,9 +100,8 @@ def customer_menu(username):
 
             message(f"Pembelian berhasil: {success_count} dari {jumlah}")
 
-        # =========================================================
-        # 2. JUAL BARANG KE TOKO
-        # =========================================================
+        
+        # 2. jual barang ke toko
         elif pilih == 2:
             print()
             header("Jual Barang Ke Toko")
@@ -162,9 +161,9 @@ def customer_menu(username):
                     f"Stok: {jumlah}"
                 )
 
-        # =========================================================
-        # 3. STATUS BARANG YANG DIJUAL
-        # =========================================================
+        
+        # 3. status barang dijual
+        
         elif pilih == 3:
             print()
             header("Status Barang Yang Anda Jual")
@@ -192,9 +191,9 @@ def customer_menu(username):
                 message("Tidak ada barang milik Anda.")
                 continue
 
-            # =========================================================
-            # TABEL 2 — DITERIMA
-            # =========================================================
+            
+            # 2. diterima
+            
             if diterima:
                 print()
                 header("BARANG DISETUJUI ADMIN")
@@ -215,9 +214,9 @@ def customer_menu(username):
                 ))
 
 
-            # =========================================================
-            # TABEL 3 — DITOLAK
-            # =========================================================
+            
+            # 3. ditolak
+           
             if ditolak:
                 print()
                 header("BARANG DITOLAK ADMIN")
@@ -237,8 +236,7 @@ def customer_menu(username):
                     rows_ditolak
                 ))
 
-        # =========================================================
-        # 4. LOGOUT
-        # =========================================================
+        # 4. logout
+       
         else:
             break
