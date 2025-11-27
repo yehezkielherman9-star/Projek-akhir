@@ -14,9 +14,7 @@ def save_json(filename, data):
     with open(filename, "w") as f:
         json.dump(data, f, indent=4)
 
-# =========================
-# DATA GLOBAL
-# =========================
+# data json
 users = load_json("users.json", {
     "ADMIN": {"password": "admin123", "role": "ADMIN"}
 })

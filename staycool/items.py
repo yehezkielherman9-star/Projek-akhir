@@ -179,3 +179,19 @@ def refresh_sales_history():
 
     storage.sales_history = new_list
     storage.save_all()
+
+def format_item_list(item_dict):
+        if not item_dict:
+            return "Barang kosong"
+
+        lines = []
+        for item_id, data in item_dict.items():
+            name = data.get("name", "-")
+            price = data.get("price", "-")
+            stock = data.get("stock", "-")
+
+            lines.append(
+                f"{item_id}. {name} — Rp{price} | Stok: {stock}"
+            )
+
+        return "\n".join(lines)

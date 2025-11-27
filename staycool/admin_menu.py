@@ -20,7 +20,7 @@ def admin_menu():
         pilih = menu("Pilih opsi:", [
             "Tambah Barang",
             "Ubah Barang",
-            "Lihat Barang Toko",
+            "List Barang Toko",
             "Konfirmasi barang yang Dijual Pelanggan",
             "History",
             "Logout"
@@ -74,7 +74,7 @@ def admin_menu():
                 message("Belum ada barang di toko.")
                 continue
 
-            list_text = items.format_items_list(storage.items)
+            list_text = items.format_item_list(storage.items)
             inp = prompt_under_list(list_text, "Pilih barang yang diubah:")
             if inp is None:
                 continue
@@ -83,15 +83,17 @@ def admin_menu():
             if item_id not in storage.items:
                 message("Barang tidak ditemukan.")
                 continue
-
-            # tampilkan tabel semua barang
-            rows = [
-                [iid, v["name"], f"Rp{v['price']}", v.get("stock", 0)]
-                for iid, v in storage.items.items()
-            ]
-            message(make_table(["ID", "Nama", "Harga", "Stok"], rows))
-
+            
             item = storage.items[item_id]
+
+            rows = [
+                [item_id, item["name"], f"Rp{item['price']}", item.get("stock", 0)]
+            ]
+
+            message(make_table(
+                ["ID", "Nama", "Harga", "Stok"],
+                rows
+            ))
 
             new_name = prompt("Nama baru (enter jika tidak):").strip()
             new_price_input = prompt("Harga baru (enter jika tidak):").strip()
