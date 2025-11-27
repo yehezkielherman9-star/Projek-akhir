@@ -13,7 +13,7 @@ def customer_menu(username):
         pilih = menu(
             "Pilih opsi:",
             [
-                "Lihat Barang Toko",
+                "List Barang Toko",
                 "Beli Barang",
                 "Jual Barang ke Toko",
                 "Status Barang yang Dijual",
@@ -44,7 +44,6 @@ def customer_menu(username):
 
         
         # 1. beli barang
-        
         elif pilih == 1:
             print()
             header("Beli Barang")
@@ -53,14 +52,14 @@ def customer_menu(username):
                 message("Belum ada barang di toko.")
                 continue
 
-            # TABEL TOKO
+            # TABEL barang di toko
             rows = [
                 [item_id, d["name"], f"Rp{d['price']}", d.get("stock", 0)]
                 for item_id, d in storage.items.items()
             ]
             message(make_table(["ID", "Nama", "Harga", "Stok"], rows))
 
-            # LIST PILIHAN
+            # list pilihan
             list_text = "\n".join([
                 f"{i}. {d['name']} - Rp{d['price']} | Stok: {d.get('stock', 0)}"
                 for i, d in storage.items.items()
@@ -88,6 +87,10 @@ def customer_menu(username):
 
             jumlah = int(jumlah_input)
 
+            if jumlah > item.get("stock", 0):
+                message(f"Jumlah melebihi stok tersedia ({item.get('stock', 0)}).")
+                continue
+            
             if confirm_or_back(
                 f"Beli {jumlah}x '{item['name']}' (Rp{item['price']} per item)?"
             ) is None:
@@ -129,7 +132,6 @@ def customer_menu(username):
             ) is None:
                 continue
 
-            # CEK ITEM SAMA YANG MASIH PENDING
             existing_id = None
             for item_id, data in storage.sell_queue.items():
                 if (
@@ -156,14 +158,13 @@ def customer_menu(username):
 
                 message(
                     f"Pengajuan berhasil!\n"
-                    f"Nama: {name}\n"
                     f"ID Baru: {new_id}\n"
+                    f"Nama: {name}\n"
                     f"Stok: {jumlah}"
                 )
 
         
         # 3. status barang dijual
-        
         elif pilih == 3:
             print()
             header("Status Barang Yang Anda Jual")
@@ -172,12 +173,12 @@ def customer_menu(username):
             diterima = []
             ditolak = []
 
-            # === Pending (sell_queue)
+            # data barang yang dijual
             for item_id, d in storage.sell_queue.items():
                 if d["owner"] == username:
                     pending.append((item_id, d))
 
-            # === Final Status (sales_history)
+            # DATA DITERIMA & DITOLAK
             for h in storage.sales_history:
                 if h.get("seller") != username:
                     continue
@@ -187,13 +188,33 @@ def customer_menu(username):
                 elif h.get("status") == "Ditolak":
                     ditolak.append(h)
 
+            # Jika semuanya kosong
             if not pending and not diterima and not ditolak:
                 message("Tidak ada barang milik Anda.")
                 continue
 
-            
-            # 2. diterima
-            
+            # TABEL 1 — Menunggu konfirmasi
+            if pending:
+                print()
+                header("MENUNGGU KONFIRMASI ADMIN")
+
+                rows_pending = [
+                    [
+                        item_id,
+                        d["name"],
+                        f"Rp{d['price']}",
+                        d.get("stock", 1),
+                        "Menunggu konfirmasi"
+                    ]
+                    for item_id, d in pending
+                ]
+
+                message(make_table(
+                    ["ID", "Nama", "Harga", "Stok", "Status"],
+                    rows_pending
+                ))
+
+            # TABEL 2 — Diterima
             if diterima:
                 print()
                 header("BARANG DISETUJUI ADMIN")
@@ -213,10 +234,7 @@ def customer_menu(username):
                     rows_diterima
                 ))
 
-
-            
-            # 3. ditolak
-           
+            # TABEL 3 — ditolak
             if ditolak:
                 print()
                 header("BARANG DITOLAK ADMIN")
@@ -236,7 +254,6 @@ def customer_menu(username):
                     rows_ditolak
                 ))
 
-        # 4. logout
-       
+        # 4. logout       
         else:
             break

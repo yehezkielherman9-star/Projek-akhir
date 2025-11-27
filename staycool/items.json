@@ -29,11 +29,6 @@
         "price": 9000000,
         "stock": 9
     },
-    "7": {
-        "name": "moge pak prabowo",
-        "price": 90000000,
-        "stock": 1
-    },
     "8": {
         "name": "apple jaman nuh",
         "price": 900000000,
@@ -53,11 +48,6 @@
         "name": "excalibur",
         "price": 9000000000,
         "stock": 2
-    },
-    "12": {
-        "name": "peluru wwII",
-        "price": 900000,
-        "stock": 9
     },
     "13": {
         "name": "piring kerajaan",
@@ -98,15 +88,5 @@
         "name": "emas batang",
         "price": 9000000,
         "stock": 9
-    },
-    "21": {
-        "name": "jawa",
-        "price": 1000000000,
-        "stock": 10
-    },
-    "22": {
-        "name": "jumanji",
-        "price": 9000000,
-        "stock": 3
     }
 }
