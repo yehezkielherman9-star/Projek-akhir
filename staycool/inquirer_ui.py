@@ -1,27 +1,22 @@
 import os
 from InquirerPy import inquirer
 
-# =========================================================
-# CLEAR TERMINAL
-# =========================================================
+# clear
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
+# tabel
 def make_table(headers, rows):
-    # Hitung lebar kolom
     col_widths = [len(h) for h in headers]
 
     for row in rows:
         for i, col in enumerate(row):
             col_widths[i] = max(col_widths[i], len(str(col)))
 
-    # Header
     header_line = " | ".join(headers[i].ljust(col_widths[i]) for i in range(len(headers)))
 
-    # Garis bawah
     separator = "-".join('-' * (col_widths[i] + 2) for i in range(len(headers)))
 
-    # Isi tabel
     row_lines = []
     for row in rows:
         line = " | ".join(str(row[i]).ljust(col_widths[i]) for i in range(len(row)))
@@ -30,9 +25,8 @@ def make_table(headers, rows):
     return f"{header_line}\n{separator}\n" + "\n".join(row_lines)
 
 
-# =========================================================
-# MENU INTERAKTIF (SINKRON DENGAN MENU AWAL)
-# =========================================================
+
+# option
 def menu(title, options):
 
     choice = inquirer.select(
@@ -44,26 +38,22 @@ def menu(title, options):
 
     return options.index(choice)
 
-# =========================================================
-# PROMPT INPUT BIASA
-# =========================================================
+
+# input
 def prompt(msg):
     return inquirer.text(
         message=msg,
         qmark=""
     ).execute().strip()
 
-# =========================================================
-# PESAN POP-UP
-# =========================================================
+
+# pesan
 def message(msg):
     clear_terminal()
     print(msg)
     input("\nTekan Enter untuk melanjutkan...")
 
-# =========================================================
-# PROMPT DARI LIST MULTILINE
-# =========================================================
+# list
 def prompt_under_list(list_text, prompt_text):
     lines = list_text.splitlines()
 
@@ -80,15 +70,12 @@ def prompt_under_list(list_text, prompt_text):
     except Exception:
         return None
 
-    # Ambil ID sebelum titik
     if "." in choice:
         return choice.split(".")[0].strip()
 
     return choice.strip()
 
-# =========================================================
-# KONFIRM YA / TIDAK
-# =========================================================
+# terima atau tolak
 def confirm_or_back(msg):
     result = inquirer.confirm(
         message=msg,

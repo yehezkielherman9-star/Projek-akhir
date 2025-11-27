@@ -7,9 +7,7 @@ def now_time():
 def normalize_id(item_id):
     return str(item_id)
 
-# ==================================================
-# Tambah Barang
-# ==================================================
+# Tambah barang
 def add_item(name, price, stock=1):
     for item_id, item in storage.items.items():
         if item["name"].lower() == name.lower():
@@ -31,9 +29,7 @@ def add_item(name, price, stock=1):
     refresh_items()
     return str(new_id)
 
-# ==================================================
-# Customer Membeli Barang
-# ==================================================
+# Customer membeli barang
 def customer_buy_item(item_id, username):
     key = normalize_id(item_id)
 
@@ -58,9 +54,7 @@ def customer_buy_item(item_id, username):
     storage.save_all()
     return True
 
-# ==================================================
-# Customer Ajukan Jual Barang (Pending)
-# ==================================================
+# Customer ajukan barang yang di jual
 def request_sell_item(owner, name, price, stock=1):
 
     for item_id, item in storage.sell_queue.items():
@@ -90,9 +84,7 @@ def request_sell_item(owner, name, price, stock=1):
     refresh_sell_queue()
     return str(new_id)
 
-# ==================================================
-# ADMIN – Setujui Barang Customer
-# ==================================================
+# ADMIN – Setujui barang customer
 def approve_buy_from_customer(item_id, quantity):
     key = normalize_id(item_id)
 
@@ -115,7 +107,6 @@ def approve_buy_from_customer(item_id, quantity):
         storage.sell_queue[key]["stock"] = remaining
         storage.sell_queue[key]["status"] = "Menunggu Konfirmasi"
 
-    # Tambahkan history diterima
     storage.sales_history.append({
         "time": now_time(),
         "name": data["name"],
@@ -131,9 +122,7 @@ def approve_buy_from_customer(item_id, quantity):
     refresh_sales_history()
     return True
 
-# ==================================================
-# ADMIN – Tolak Barang Customer
-# ==================================================
+# ADMIN – Tolak barang customer
 def reject_sell_item(item_id):
     key = normalize_id(item_id)
 
@@ -159,16 +148,13 @@ def reject_sell_item(item_id):
     refresh_sales_history()
     return True
 
-# ==================================================
-# Refresh Item Toko
-# ==================================================
+# Refresh barang di toko
 def refresh_items():
     storage.items = dict(sorted(storage.items.items(), key=lambda x: int(x[0])))
     storage.save_all()
 
-# ==================================================
-# Refresh Sell Queue (Pending ID selalu urut)
-# ==================================================
+
+# Refresh pending
 def refresh_sell_queue():
     new_dict = {}
     new_id = 1
@@ -180,9 +166,7 @@ def refresh_sell_queue():
     storage.sell_queue = new_dict
     storage.save_all()
 
-# ==================================================
-# Refresh History (ID bagian Diterima & Ditolak selalu urut)
-# ==================================================
+# Refresh status penjualan
 def refresh_sales_history():
     new_list = []
     new_id = 1

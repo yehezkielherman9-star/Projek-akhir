@@ -10,7 +10,8 @@ def header(text):
     print(f"╔{garis}╗")
     print(f"║   {text}   ║")
     print(f"╚{garis}╝")
-    
+
+# login
 def main():
     while True:
         header("SELAMAT DATANG DI TOKO BARANG ANTIK")
